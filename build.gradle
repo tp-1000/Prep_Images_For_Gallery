@@ -10,8 +10,20 @@ plugins {
     // Apply the java plugin to add support for Java
     id 'java'
 
+    // javaFX
+    id "org.openjfx.javafxplugin" version "0.0.9"
+
     // Apply the application plugin to add support for building a CLI application.
     id 'application'
+}
+
+
+sourceCompatibility = "11"
+targetCompatibility = "11"
+
+javafx {
+    version = "15.0.1"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 repositories {
@@ -20,13 +32,7 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    // This dependency is used by the application.
-    implementation 'com.google.guava:guava:29.0-jre'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.13'
-}
+dependencies {}
 
 application {
     // Define the main class for the application.

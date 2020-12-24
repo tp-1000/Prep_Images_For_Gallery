@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<!--    For the login form, you will use a GridPane layout because it enables you to create a
+        flexible grid of rows and columns in which to lay out controls.-->
+
+<!--    Remove the AnchorPane layout and its children and replace it with the GridPane layout in Example-->
+
+
+<!--gird pane or anchor is the root
+    has two attributes
+    controller (controller based event handler and xmlna:fx (name space specification)
+-->
+<!--          gaps specified for columns-->
+<!--          columns literally a grid-->
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Button?>
+
+
+<?import java.net.URL?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.image.ImageView?>
+<GridPane fx:controller="RenameApp.Controller"
+          xmlns:fx="http://javafx.com/fxml" hgap="10" vgap="10">
+
+<!--oldName * selectable words-->
+<!--newName * listens for input values-->
+<!--paint,sketch,draw * radios-->
+<!--    if paint -->
+<!--    oil, watercolor-->
+<!--    plein air, studio-->
+<!--size * 2 input field -->
+<!--name * input field-->
+<!--    auto gen name * disables name field-->
+<!--preview image-->
+</GridPane>
