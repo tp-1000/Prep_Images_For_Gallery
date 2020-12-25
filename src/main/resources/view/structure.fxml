@@ -2,43 +2,92 @@
 
 
 <?import javafx.scene.layout.*?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
-
-<!--    For the login form, you will use a GridPane layout because it enables you to create a
-        flexible grid of rows and columns in which to lay out controls.-->
-
-<!--    Remove the AnchorPane layout and its children and replace it with the GridPane layout in Example-->
-
-
-<!--gird pane or anchor is the root
-    has two attributes
-    controller (controller based event handler and xmlna:fx (name space specification)
--->
-<!--          gaps specified for columns-->
-<!--          columns literally a grid-->
-
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Button?>
-
-
-<?import java.net.URL?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.Group?>
 <GridPane fx:controller="RenameApp.Controller"
           xmlns:fx="http://javafx.com/fxml" hgap="10" vgap="10">
+    <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
 
-<!--oldName * selectable words-->
-<!--newName * listens for input values-->
-<!--paint,sketch,draw * radios-->
+    <VBox spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="0"
+          GridPane.columnSpan="2">
+    <!--oldName * selectable words-->
+        <TextField fx:id="originalName" text="the original name here" editable="false"
+                   style="-fx-background-color: -fx-control-inner-background;"
+                    focusTraversable="false"/>
+
+    <!--newName * listens for input values-->
+        <Text fx:id="newName" text="new name here"/>
+    </VBox>
+
+    <!--paint,sketch,draw * radios if other than paint(p) disable next sets of radios -->
+    <HBox spacing="15"
+            GridPane.columnIndex="1" GridPane.rowIndex="1"
+            GridPane.columnSpan="2">
+
+        <fx:define>
+            <ToggleGroup fx:id="cat"/>
+        </fx:define>
+        <RadioButton userData="p" toggleGroup="$cat" selected="true" text="paint"/>
+        <RadioButton userData="d" toggleGroup="$cat" selected="false" text="draw"/>
+        <RadioButton userData="s" toggleGroup="$cat" selected="false" text="sketch"/>
+
+    </HBox>
+
+
 <!--    if paint -->
 <!--    oil, watercolor-->
+    <HBox spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="2"
+          GridPane.columnSpan="2" fx:id="disable_medium">
+
+        <fx:define>
+            <ToggleGroup fx:id="medium"/>
+        </fx:define>
+        <RadioButton userData="o" toggleGroup="$medium" selected="true" text="oil"/>
+        <RadioButton userData="w" toggleGroup="$medium" selected="false" text="watercolor"/>
+
+    </HBox>
 <!--    plein air, studio-->
+    <HBox spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="3"
+          GridPane.columnSpan="2" fx:id="disable_place">
+
+        <fx:define>
+            <ToggleGroup fx:id="place"/>
+        </fx:define>
+        <RadioButton userData="y" toggleGroup="$place" selected="true" text="plein air"/>
+        <RadioButton userData="b" toggleGroup="$place" selected="false" text="studio"/>
+
+    </HBox>
+
 <!--size * 2 input field -->
+    <HBox spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="4"
+          GridPane.columnSpan="2">
+
+        <Label text="Height"/>
+        <TextField fx:id="height" text="12" maxWidth="42"/>
+        <Label text="Width"/>
+        <TextField fx:id="width" text="14" maxWidth="42"/>
+    </HBox>
+
 <!--name * input field-->
+    <HBox spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="5"
+          GridPane.columnSpan="2">
+
+        <TextField fx:id="name" text="name"/>
+        <CheckBox fx:id="generate" text="auto_gen"/>
+
+    </HBox>
 <!--    auto gen name * disables name field-->
 <!--preview image-->
 </GridPane>
