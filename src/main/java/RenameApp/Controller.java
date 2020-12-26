@@ -27,6 +27,7 @@ import java.nio.file.Path;
 
 public class Controller {
 
+    @FXML private TextField originalName;
     @FXML private Text newName;
     @FXML private ToggleGroup cat;
     @FXML private ToggleGroup medium;
@@ -129,7 +130,7 @@ public class Controller {
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
-                    setPreviewImg(filePath);
+                    setPreviewImgAndName(filePath);
                     Platform.enterNestedEventLoop(STOP_KEY);
                 }
             } catch (IOException e) {
@@ -179,14 +180,16 @@ public class Controller {
 
     }
 
-    //set preview image
-    public void setPreviewImg(Path filePath) {
+    //set preview image + original name
+    public void setPreviewImgAndName(Path filePath) {
         try {
             previewImage.setImage(new Image(filePath.toUri().toURL().toString(), true));
             previewImage.setFitWidth(400);
             previewImage.setPreserveRatio(true);
             previewImage.setSmooth(true);
             previewImage.setCache(true);
+            //name
+            originalName.setText( filePath.getFileName().toString() );
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
