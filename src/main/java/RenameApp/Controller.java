@@ -13,12 +13,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,6 +51,8 @@ public class Controller {
     //stop-start key for controlling stream of images
     private final Object STOP_KEY = new Object();
 
+    //image
+    @FXML private ImageView previewImage;
 
     public void initialize() {
         StringBinding nameString;
@@ -125,7 +129,7 @@ public class Controller {
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
-                    System.out.println(filePath);
+                    setPreviewImg(filePath);
                     Platform.enterNestedEventLoop(STOP_KEY);
                 }
             } catch (IOException e) {
@@ -175,7 +179,19 @@ public class Controller {
 
     }
 
+    //set preview image
+    public void setPreviewImg(Path filePath) {
+        try {
+            previewImage.setImage(new Image(filePath.toUri().toURL().toString(), true));
+            previewImage.setFitWidth(400);
+            previewImage.setPreserveRatio(true);
+            previewImage.setSmooth(true);
+            previewImage.setCache(true);
 
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
