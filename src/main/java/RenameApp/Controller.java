@@ -55,6 +55,8 @@ public class Controller {
     //image
     @FXML private ImageView previewImage;
 
+    //parseName set up
+    //name is a combination of active radios and name input
     public void initialize() {
         StringBinding nameString;
         
@@ -158,9 +160,6 @@ public class Controller {
  @FXML private void save(){
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }
-
-    //parseName
-        //name is a combination of active radios and name input
 
     //disable extra radios if !paint radio selected
     private void disableToggles() {
