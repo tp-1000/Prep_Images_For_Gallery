@@ -1,5 +1,6 @@
 package RenameApp;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.binding.StringExpression;
@@ -11,9 +12,15 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Controller {
@@ -38,6 +45,9 @@ public class Controller {
     SimpleStringProperty heightValue = new SimpleStringProperty();
     SimpleStringProperty widthValue = new SimpleStringProperty();
     SimpleStringProperty nameValue = new SimpleStringProperty();
+
+    //stop-start key for controlling stream of images
+    private final Object STOP_KEY = new Object();
 
 
     public void initialize() {
@@ -92,7 +102,9 @@ public class Controller {
 
         newName.textProperty().bind(nameBind);
 
+
     }
+
 
     //pickDirectory
         //directory selected
@@ -103,34 +115,44 @@ public class Controller {
         //set original name to original name
         //stop thread
         //alert finished --- exiting
+  @FXML  private void dirPickerDialog(){
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select a folder");
+        File selectedDir  = directoryChooser.showDialog(null);
+
+        //pause thread
+        Platform.runLater( ()-> {
+            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
+                //for loop of stream to get next image file...
+                for(Path filePath : dirStream){
+                    System.out.println(filePath);
+                    Platform.enterNestedEventLoop(STOP_KEY);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        });
+
+        }
+
+
 
     //auto-gen name
         //if clicked disable name input
         //create name based off getting file count in selected cat dir
-//private void autoGenName() {
-//    if (nameDTO.getPartType().equals("d")) {
-//        int numberOfFiles = ImageProcessor.getDirDrawLargeLocation().toFile().list().length + 1;
-//        nameDTO.setPartName(nameDTO.getPartName().concat("_Drawing_").concat(String.valueOf(numberOfFiles)));
-//    } else if (nameDTO.getPartType().equals("s")) {
-//        int numberOfFiles = ImageProcessor.getDirDrawLargeLocation().toFile().list().length + 1;
-//        nameDTO.setPartName(nameDTO.getPartName().concat("_Sketch_").concat(String.valueOf(numberOfFiles)));
-//    } else if (nameDTO.getPartType().equals("p")) {
-//        int numberOfFiles = ImageProcessor.getDirPaintLargeLocation().toFile().list().length + 1;
-//        if (nameDTO.getPartEnv().equals("y")) {
-//            nameDTO.setPartName(nameDTO.getPartName().concat("_Plein_Air_").concat(String.valueOf(numberOfFiles)));
-//        } else if (nameDTO.getPartType().equals("o")) {
-//            nameDTO.setPartName(nameDTO.getPartName().concat("_Oil_").concat(String.valueOf(numberOfFiles)));
-//        } else if (nameDTO.getPartType().equals("w")) {
-//            nameDTO.setPartName(nameDTO.getPartName().concat("_Watercolor_").concat(String.valueOf(numberOfFiles)));
-//        }
-//    }
-//}
+
+
+
     //save
         //uses new name
         //new thread for image process? (most likely process image class extends thread-able)
         //files get resample and go to small/large
         //files go to correct dir
         //resume thread
+ @FXML private void save(){
+        Platform.exitNestedEventLoop(STOP_KEY, null);
+    }
 
     //parseName
         //name is a combination of active radios and name input
@@ -152,6 +174,7 @@ public class Controller {
         }
 
     }
+
 
 
 

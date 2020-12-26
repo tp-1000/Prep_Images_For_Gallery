@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
 <GridPane fx:controller="RenameApp.Controller"
           xmlns:fx="http://javafx.com/fxml" hgap="10" vgap="10">
     <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
@@ -18,13 +19,19 @@
     <VBox spacing="15"
           GridPane.columnIndex="1" GridPane.rowIndex="0"
           GridPane.columnSpan="2">
-    <!--oldName * selectable words-->
-        <TextField fx:id="originalName" text="the original name here" editable="false"
-                   style="-fx-background-color: -fx-control-inner-background;"
-                    focusTraversable="false"/>
+
+    <HBox spacing="15">
+        <!--oldName * selectable words-->
+            <TextField fx:id="originalName" text="original name" editable="false"
+                       style="-fx-background-color: -fx-control-inner-background;"
+                        focusTraversable="false"/>
+        <!--button to pick directory-->
+            <Button text="Select a folder" onAction="#dirPickerDialog"></Button>
+    </HBox>
 
     <!--newName * listens for input values-->
-        <Text fx:id="newName" text="new name here"/>
+        <Text fx:id="newName" text="new name here"
+              style="-fx-font-family: 'monospaced';"/>
     </VBox>
 
     <!--paint,sketch,draw * radios if other than paint(p) disable next sets of radios -->
@@ -85,9 +92,14 @@
           GridPane.columnSpan="2">
 
         <TextField fx:id="name" text="name"/>
+<!--    auto gen name * disables name field-->
         <CheckBox fx:id="generate" text="auto_gen"/>
+    </HBox>
+    <HBox alignment="CENTER" spacing="15"
+          GridPane.columnIndex="1" GridPane.rowIndex="6"
+          GridPane.columnSpan="2">
+        <Button text="Save" onAction="#save"/>
 
     </HBox>
-<!--    auto gen name * disables name field-->
 <!--preview image-->
 </GridPane>
