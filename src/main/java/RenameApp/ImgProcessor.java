@@ -67,13 +67,36 @@ public class ImgProcessor {
     }
 
     //save large
+    protected static void saveLarge() {
+        // create command
+        ConvertCmd cmd = new ConvertCmd();
+
+        // create the operation, add images and operators/options
+        IMOperation op = new IMOperation();
+        op.addImage();
+        op.filter("Lanczos");
+        op.resize(350,500);
+        op.strip();
+        op.unsharp(0.0,.5,0.5, 0.05 );
+        op.quality(80.0);
+        op.addImage();
+
+        try {
+            cmd.run(op,currentFile.toString(), currentFile.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IM4JavaException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     //save image to folders
         //save thumbnail
         //save large
         //image moved to completed.
-
-    //
 
 
     //low priority
