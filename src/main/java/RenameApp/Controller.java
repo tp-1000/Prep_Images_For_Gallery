@@ -4,14 +4,12 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.binding.StringExpression;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -41,6 +39,10 @@ public class Controller {
     @FXML private HBox disable_medium;
     @FXML private HBox disable_place;
 
+    //disable save
+    @FXML private Button saveBtn;
+    private SimpleBooleanProperty nofiles = new SimpleBooleanProperty(true);
+
     //used for name binding
     SimpleStringProperty catValue;
     SimpleStringProperty mediumValue;
@@ -59,6 +61,9 @@ public class Controller {
     //parseName set up
     //name is a combination of active radios and name input
     public void initialize() {
+        //disable save button when no files
+        saveBtn.disableProperty().bind(nofiles);
+
         StringBinding nameString;
         
         //cat group listener
@@ -127,9 +132,12 @@ public class Controller {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select a folder");
         File selectedDir  = directoryChooser.showDialog(null);
+        //set home dir
+        imgProcessor.setHome(selectedDir.toPath());
 
         //pause thread
         Platform.runLater( ()-> {
+            nofiles.setValue(false);
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
@@ -140,7 +148,7 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            nofiles.setValue(true);
         });
 
         }
@@ -160,7 +168,7 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
-        imgProcessor.saveThumbnail();
+        imgProcessor.moveCompletedToDone(imgProcessor.getCurrentFile());
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }
 
