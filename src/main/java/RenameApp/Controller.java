@@ -53,6 +53,7 @@ public class Controller {
     private final Object STOP_KEY = new Object();
 
     //image
+    private final ImgProcessor imgProcessor = new ImgProcessor();
     @FXML private ImageView previewImage;
 
     //parseName set up
@@ -132,6 +133,7 @@ public class Controller {
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
+                    imgProcessor.setCurrentFile(filePath);
                     setPreviewImgAndName(filePath);
                     Platform.enterNestedEventLoop(STOP_KEY);
                 }
@@ -158,6 +160,7 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
+        imgProcessor.saveThumbnail();
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }
 
