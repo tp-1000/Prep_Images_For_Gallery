@@ -42,6 +42,30 @@ public class ImgProcessor {
         }
     }
 
+    public Path getPaintDir() {
+        return paintDir;
+    }
+
+    public void setPaintDir(Path paintDir) {
+        this.paintDir = paintDir;
+    }
+
+    public Path getDrawDir() {
+        return drawDir;
+    }
+
+    public void setDrawDir(Path drawDir) {
+        this.drawDir = drawDir;
+    }
+
+    public Path getSketchDir() {
+        return sketchDir;
+    }
+
+    public void setSketchDir(Path sketchDir) {
+        this.sketchDir = sketchDir;
+    }
+
     public Path getCurrentFile() {
         return currentFile;
     }
@@ -79,7 +103,7 @@ public class ImgProcessor {
 
 
     //save thumbnail
-    protected void saveThumbnail() {
+    private void saveThumbnail(String name) {
             // create command
             ConvertCmd cmd = new ConvertCmd();
 
@@ -94,7 +118,7 @@ public class ImgProcessor {
             op.addImage();
 
         try {
-            cmd.run(op,currentFile.toString(), currentFile.toString());
+            cmd.run( op,currentFile.toString(), home.resolve( getCatDir(name)+"/small/"+name ).toString() );
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -106,7 +130,7 @@ public class ImgProcessor {
     }
 
     //save large
-    protected void saveLarge() {
+    private void saveLarge(String name) {
         // create command
         ConvertCmd cmd = new ConvertCmd();
 
@@ -114,14 +138,14 @@ public class ImgProcessor {
         IMOperation op = new IMOperation();
         op.addImage();
         op.filter("Lanczos");
-        op.resize(350,500);
+        op.resize(1200,1500);
         op.strip();
         op.unsharp(0.0,.5,0.5, 0.05 );
         op.quality(80.0);
         op.addImage();
 
         try {
-            cmd.run(op,currentFile.toString(), currentFile.toString());
+            cmd.run( op,currentFile.toString(), home.resolve( getCatDir(name)+"/large/"+name ).toString() );
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -132,7 +156,9 @@ public class ImgProcessor {
 
     }
 
-    protected void moveCompletedToDone(Path currentFile){
+
+
+    private void moveCompletedToDone(){
         try {
             Files.move( currentFile, completedDir.resolve( currentFile.getFileName() ) );
         } catch (IOException e) {
@@ -143,8 +169,32 @@ public class ImgProcessor {
         //save thumbnail
         //save large
         //image moved to completed.
+    protected void save(String name) {
 
 
+        saveLarge(name);
+        saveThumbnail(name);
+        moveCompletedToDone();
+
+    }
+
+    private String getCatDir(String name) {
+        char cat = name.charAt(0);
+
+        String catDir = "";
+        switch (cat) {
+            case 'p':
+                catDir = "paint";
+                break;
+            case 'd':
+                catDir = "draw";
+                break;
+            case 's':
+                catDir = "sketch";
+                break;
+        }
+        return catDir;
+    }
     //low priority
     //may need a text key csv -- old names, new names
 

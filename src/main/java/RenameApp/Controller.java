@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.Callable;
 
 public class Controller {
 
@@ -50,6 +51,7 @@ public class Controller {
     SimpleStringProperty heightValue = new SimpleStringProperty();
     SimpleStringProperty widthValue = new SimpleStringProperty();
     SimpleStringProperty nameValue = new SimpleStringProperty();
+    SimpleStringProperty genNameValue = new SimpleStringProperty();
 
     //stop-start key for controlling stream of images
     private final Object STOP_KEY = new Object();
@@ -61,13 +63,25 @@ public class Controller {
     //parseName set up
     //name is a combination of active radios and name input
     public void initialize() {
+
+
         //disable save button when no files
         saveBtn.disableProperty().bind(nofiles);
 
-        StringBinding nameString;
-        
+//        //name listener - if there is no input generate a name
+//        name.textProperty().addListener(new ChangeListener<String>() {
+//            public void changed(ObservableValue<? extends String> ov,
+//                                String old_toggle, String new_toggle) {
+//                if ( name.textProperty().isEmpty().getValue() ) {
+//                    nameValue.setValue( genName() );
+//                }
+//            }
+//        });
+
+
         //cat group listener
         catValue = new SimpleStringProperty( cat.getSelectedToggle().getUserData().toString() );
+
 
         cat.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ov,
@@ -75,9 +89,13 @@ public class Controller {
                 if (cat.getSelectedToggle() != null) {
                     catValue.setValue( cat.getSelectedToggle().getUserData().toString() );
                     disableToggles();
+
+                    //changes to the same value to activate listener
+                    name.textProperty().setValue(name.textProperty().getValue());
                 }
             }
         });
+
 
         //medium group listener
         mediumValue = new SimpleStringProperty( medium.getSelectedToggle().getUserData().toString() );
@@ -103,19 +121,21 @@ public class Controller {
             }
         });
 
+
         //height binding
         heightValue.bind(height.textProperty());
         //width binding
         widthValue.bind(width.textProperty());
         //name binding
         nameValue.bind(name.textProperty());
-        StringExpression nameBind = Bindings.concat( catValue,mediumValue,placeValue
-                ,heightValue.concat("_"),widthValue.concat("_"),nameValue);
+        nameValue.bind( Bindings.when( name.textProperty().isNotEmpty() ).then( name.textProperty() ).otherwise( Bindings.createStringBinding( genNameBinding(), nameValue ) ) );
+//        nameValue.bind( Bindings.when( name.textProperty().isNotEmpty() ).then( name.textProperty() ).otherwise( genNameValue ) );
         //string builder
+        StringExpression nameBind = Bindings.concat( catValue,mediumValue,placeValue
+                ,heightValue.concat("X"),widthValue.concat("_"),nameValue.concat(".jpeg"));
+
 
         newName.textProperty().bind(nameBind);
-
-
     }
 
 
@@ -143,6 +163,9 @@ public class Controller {
                 for(Path filePath : dirStream){
                     imgProcessor.setCurrentFile(filePath);
                     setPreviewImgAndName(filePath);
+
+                    //empty name input activate listener
+                    name.textProperty().setValue("");
                     Platform.enterNestedEventLoop(STOP_KEY);
                 }
             } catch (IOException e) {
@@ -150,7 +173,6 @@ public class Controller {
             }
             nofiles.setValue(true);
         });
-
         }
 
 
@@ -168,7 +190,7 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
-        imgProcessor.moveCompletedToDone(imgProcessor.getCurrentFile());
+        imgProcessor.save(newName.getText());
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }
 
@@ -191,7 +213,7 @@ public class Controller {
     }
 
     //set preview image + original name
-    public void setPreviewImgAndName(Path filePath) {
+    private void setPreviewImgAndName(Path filePath) {
         try {
             previewImage.setImage(new Image(filePath.toUri().toURL().toString(), true));
             previewImage.setFitWidth(400);
@@ -205,6 +227,39 @@ public class Controller {
             e.printStackTrace();
         }
     }
+
+
+
+    private Callable<String> genNameBinding(){
+            return () -> {
+            String name = "Untitled";
+            if( imgProcessor.getHome() != null ) {
+                char charKey = catValue.getValue().charAt(0);
+                int fileCount;
+                switch (charKey) {
+                    case 'p':
+                        fileCount = imgProcessor.getPaintDir().toFile().list().length;
+                        if (mediumValue.getValue().charAt(0) == 'o') {
+                            name = "Untitled_Oil_" + fileCount;
+                        } else {
+                            name = "Untitled_WaterColor_" + fileCount;
+                        }
+                        break;
+                    case 'd':
+                        fileCount = imgProcessor.getDrawDir().toFile().list().length;
+                        name = "Untitled_Drawing_" + fileCount;
+                        break;
+                    case 's':
+                        fileCount = imgProcessor.getSketchDir().toFile().list().length;
+                        name = "Untitled_Sketch_" + fileCount;
+                        break;
+                }
+            }
+            return name;
+        };
+    }
+
+
 
 
 }
