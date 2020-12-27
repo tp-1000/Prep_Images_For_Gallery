@@ -2,7 +2,6 @@ package RenameApp;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.binding.StringExpression;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -42,7 +41,8 @@ public class Controller {
 
     //disable save
     @FXML private Button saveBtn;
-    private SimpleBooleanProperty nofiles = new SimpleBooleanProperty(true);
+    private SimpleBooleanProperty blockSaveBtn = new SimpleBooleanProperty(true);
+    @FXML private Label nameWarning;
 
     //used for name binding
     SimpleStringProperty catValue;
@@ -51,7 +51,6 @@ public class Controller {
     SimpleStringProperty heightValue = new SimpleStringProperty();
     SimpleStringProperty widthValue = new SimpleStringProperty();
     SimpleStringProperty nameValue = new SimpleStringProperty();
-    SimpleStringProperty genNameValue = new SimpleStringProperty();
 
     //stop-start key for controlling stream of images
     private final Object STOP_KEY = new Object();
@@ -66,17 +65,27 @@ public class Controller {
 
 
         //disable save button when no files
-        saveBtn.disableProperty().bind(nofiles);
+        saveBtn.disableProperty().bind(blockSaveBtn);
 
-//        //name listener - if there is no input generate a name
-//        name.textProperty().addListener(new ChangeListener<String>() {
-//            public void changed(ObservableValue<? extends String> ov,
-//                                String old_toggle, String new_toggle) {
-//                if ( name.textProperty().isEmpty().getValue() ) {
-//                    nameValue.setValue( genName() );
-//                }
-//            }
-//        });
+        //name listener - if there is no input
+        newName.textProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> ov,
+                                String old_toggle, String new_toggle) {
+                if ( imgProcessor.fileExists(newName.getText()) ) {
+//                    note displayed saying non unique
+    //                    disable save btn
+                            blockSaveBtn.setValue(true);
+                            nameWarning.setText("file with that name already exists");
+//                        System.out.println("file exists");
+                } else {
+                    System.out.println("no file with that name");
+                    //clear note and set block to false
+                    blockSaveBtn.setValue(false);
+                    nameWarning.setText(null);
+                }
+
+            }
+        });
 
 
         //cat group listener
@@ -157,7 +166,7 @@ public class Controller {
 
         //pause thread
         Platform.runLater( ()-> {
-            nofiles.setValue(false);
+            blockSaveBtn.setValue(false);
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
@@ -171,16 +180,11 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            nofiles.setValue(true);
+            blockSaveBtn.setValue(true);
+            previewImage.setImage(null);
+            originalName.setText("");
         });
         }
-
-
-
-    //auto-gen name
-        //if clicked disable name input
-        //create name based off getting file count in selected cat dir
-
 
 
     //save
@@ -190,6 +194,7 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
+        name.requestFocus();
         imgProcessor.save(newName.getText());
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }

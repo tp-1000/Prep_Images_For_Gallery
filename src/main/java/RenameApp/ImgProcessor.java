@@ -4,9 +4,9 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 
 public class ImgProcessor {
     //convention is large small completed home
@@ -27,6 +27,18 @@ public class ImgProcessor {
     //completed dir
     private Path completedDir;
 
+
+    //reference file
+    private Path reference;
+
+
+    public Path getReference() {
+        return reference;
+    }
+
+    public void setReference(Path reference) {
+        this.reference = reference;
+    }
 
     public Path getHome() {
         return home;
@@ -99,6 +111,9 @@ public class ImgProcessor {
         Files.createDirectories( home.resolve("sketch/small") );
 
         completedDir = Files.createDirectories( home.resolve("completed") );
+
+        reference = Paths.get( home.resolve("reference.csv").toString() );
+        Files.createFile(reference);
     }
 
 
@@ -171,11 +186,24 @@ public class ImgProcessor {
         //image moved to completed.
     protected void save(String name) {
 
-
         saveLarge(name);
         saveThumbnail(name);
         moveCompletedToDone();
+        String content = String.format("%s,%s\r\n", currentFile.getFileName(), name );
 
+        try {
+            Files.write(reference,
+                    content.getBytes(),
+                    StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public boolean fileExists(String name) {
+        return home!=null?Files.exists( home.resolve( getCatDir(name)+"/large/"+name ) ):false;
     }
 
     private String getCatDir(String name) {

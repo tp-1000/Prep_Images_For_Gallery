@@ -17,12 +17,13 @@
           xmlns:fx="http://javafx.com/fxml" hgap="10" vgap="10">
     <padding><Insets top="25" right="25" bottom="10" left="25"/></padding>
 
-    <VBox spacing="15"
+    <VBox spacing="1"
           GridPane.columnIndex="1" GridPane.rowIndex="0"
           GridPane.columnSpan="2">
 
     <HBox spacing="15">
         <!--oldName * selectable words-->
+        <padding><Insets bottom="10"/></padding>
             <TextField fx:id="originalName" text="" editable="false"
                        style="-fx-background-color: -fx-control-inner-background;"
                         focusTraversable="false"/>
@@ -33,6 +34,8 @@
     <!--newName * listens for input values-->
         <Text fx:id="newName" text="new name here"
               style="-fx-font-family: 'monospaced';"/>
+        <Label fx:id="nameWarning" style="-fx-text-fill: red; -fx-font-size: 10px; " text=""/>
+
     </VBox>
 
     <!--paint,sketch,draw * radios if other than paint(p) disable next sets of radios -->
