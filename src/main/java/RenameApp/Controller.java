@@ -77,10 +77,11 @@ public class Controller {
                             blockSaveBtn.setValue(true);
                             nameWarning.setText("file with that name already exists");
 //                        System.out.println("file exists");
-                } else {
-                    System.out.println("no file with that name");
+                } else if (imgProcessor.getHome() != null){
                     //clear note and set block to false
                     blockSaveBtn.setValue(false);
+                    nameWarning.setText(null);
+                } else {
                     nameWarning.setText(null);
                 }
 
@@ -114,6 +115,10 @@ public class Controller {
                                 Toggle old_toggle, Toggle new_toggle) {
                 if (medium.getSelectedToggle() != null) {
                     mediumValue.setValue( medium.getSelectedToggle().getUserData().toString() );
+
+                    //changes to the same value to activate listener
+                    name.textProperty().setValue(name.textProperty().getValue());
+
                 }
             }
         });
@@ -138,7 +143,6 @@ public class Controller {
         //name binding
         nameValue.bind(name.textProperty());
         nameValue.bind( Bindings.when( name.textProperty().isNotEmpty() ).then( name.textProperty() ).otherwise( Bindings.createStringBinding( genNameBinding(), nameValue ) ) );
-//        nameValue.bind( Bindings.when( name.textProperty().isNotEmpty() ).then( name.textProperty() ).otherwise( genNameValue ) );
         //string builder
         StringExpression nameBind = Bindings.concat( catValue,mediumValue,placeValue
                 ,heightValue.concat("X"),widthValue.concat("_"),nameValue.concat(".jpeg"));
@@ -170,6 +174,7 @@ public class Controller {
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(selectedDir.toPath(), "*.{jpg,JPG,jpeg,JPEG}")){
                 //for loop of stream to get next image file...
                 for(Path filePath : dirStream){
+                    name.requestFocus();
                     imgProcessor.setCurrentFile(filePath);
                     setPreviewImgAndName(filePath);
 
@@ -194,7 +199,6 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
-        name.requestFocus();
         imgProcessor.save(newName.getText());
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }

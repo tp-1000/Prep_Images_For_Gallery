@@ -8,6 +8,8 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 
+import static java.lang.System.nanoTime;
+
 public class ImgProcessor {
     //convention is large small completed home
 
@@ -126,7 +128,7 @@ public class ImgProcessor {
             IMOperation op = new IMOperation();
             op.addImage();
             op.filter("Lanczos");
-            op.resize(350,500);
+            op.resize(320,1500);
             op.strip();
             op.unsharp(0.0,.6,0.5, 0.02 );
             op.quality(80.0);
@@ -153,7 +155,7 @@ public class ImgProcessor {
         IMOperation op = new IMOperation();
         op.addImage();
         op.filter("Lanczos");
-        op.resize(1200,1500);
+        op.resize(1200,2500);
         op.strip();
         op.unsharp(0.0,.5,0.5, 0.05 );
         op.quality(80.0);
@@ -186,10 +188,12 @@ public class ImgProcessor {
         //image moved to completed.
     protected void save(String name) {
 
+        long start = System.nanoTime();
+        System.out.println(Thread.currentThread().getName());
         saveLarge(name);
         saveThumbnail(name);
         moveCompletedToDone();
-        String content = String.format("%s,%s\r\n", currentFile.getFileName(), name );
+        String content = String.format("%s,%s\r\n", currentFile.getFileName(), name);
 
         try {
             Files.write(reference,
@@ -198,7 +202,8 @@ public class ImgProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        long end = System.nanoTime();
+        System.out.println("... "+ (end - start)/1000000 );
 
     }
 
