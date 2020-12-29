@@ -7,10 +7,15 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.InputEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -62,6 +67,18 @@ public class Controller {
     //parseName set up
     //name is a combination of active radios and name input
     public void initialize() {
+
+
+        EventHandler saveClick = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                save();
+            }
+        };
+
+        saveBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, saveClick);
+
+
 
 
         //disable save button when no files
@@ -199,7 +216,13 @@ public class Controller {
         //files go to correct dir
         //resume thread
  @FXML private void save(){
-        imgProcessor.save(newName.getText());
+        Thread p = new Thread( () -> imgProcessor.save( newName.getText() ) );
+        p.start();
+     try {
+         p.join();
+     } catch (InterruptedException e) {
+         e.printStackTrace();
+     }
         Platform.exitNestedEventLoop(STOP_KEY, null);
     }
 
